@@ -1,0 +1,1274 @@
+{
+  "name": "Recruitment Screening System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cluff",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -976,
+        -176
+      ],
+      "id": "28fe92f3-7ca1-4137-91f0-418a4bec6e28",
+      "name": "Webhook",
+      "webhookId": "05564baf-acca-42e9-8225-60656020aa11"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A9G83LV6X",
+          "mode": "list",
+          "cachedResultName": "human-resources"
+        },
+        "message": "=*New Application — Review Required*\n\n*Candidate*: {{ $('Webhook').item.json.body.firstName }} {{ $('Webhook').item.json.body.lastName }}\n*Role*: {{ $('Webhook').item.json.body.role }}\n*Email*: {{ $('Webhook').item.json.body.email }}\n*Score*: {{ $json.output[0].content[0].text.score }}/100 ({{ $json.output[0].content[0].text.score_tier }})\n*Applied*: {{ $('Webhook').item.json.body.appliedDate }}\n\n*Summary*:\n{{ $json.output[0].content[0].text.summary }}\n\n*Strengths*: {{ $json.output[0].content[0].text.strengths }}\n*Gaps*: {{ $json.output[0].content[0].text.red_flags }}\n\n*Score breakdown*:\n- Relevant experience: {{ $json.output[0].content[0].text.score_breakdown.relevant_experience }}/20\n- Skills match: {{ $json.output[0].content[0].text.score_breakdown.skills_match }}/30\n- Education: {{ $json.output[0].content[0].text.score_breakdown.education_certifications }}/10\n- Career progression: {{ $json.output[0].content[0].text.score_breakdown.career_progression }}/10\n- Communication: {{ $json.output[0].content[0].text.score_breakdown.communication_clarity }}/10\n- Practical Build: {{ $json.output[0].content[0].text.score_breakdown.practical_build }}/15\n- Role fit: {{ $json.output[0].content[0].text.score_breakdown.role_motivation_fit }}/5\n\n*Recommendation*: {{ $json.output[0].content[0].text.recommendation }}\n\nThis request expires in 5 days.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Approve - schedule interview",
+            "disapproveLabel": "Reject"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 5,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        -704,
+        160
+      ],
+      "id": "2c0c8b4a-08e6-4c61-b26b-a635bf6c6bd8",
+      "name": "Notify HR",
+      "webhookId": "81fa1749-3ed2-4dfe-94a9-ac970765ec10",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4GbqUWOQYvC1aedV",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Thank you for applying to Cluff",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Application Received</title>\n</head>\n<body style=\"margin:0;padding:0;background-color:#0d0d0d;font-family:'Georgia',Georgia,serif;\">\n\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#0d0d0d;padding:48px 20px;\">\n  <tr>\n    <td align=\"center\">\n\n      <table width=\"580\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"max-width:580px;width:100%;\">\n\n        <!-- Logo row -->\n        <tr>\n          <td style=\"padding:0 0 32px 0;\">\n            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"width:36px;height:36px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:36px;font-family:'Georgia',serif;font-size:15px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</td>\n                <td style=\"padding-left:10px;font-family:'Georgia',serif;font-size:14px;color:#666666;letter-spacing:0.1em;text-transform:uppercase;\">Cluff</td>\n              </tr>\n            </table>\n          </td>\n        </tr>\n\n        <!-- Main card -->\n        <tr>\n          <td style=\"background-color:#1a1a1a;border-radius:6px;overflow:hidden;\">\n\n            <!-- Top strip -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"background-color:#ffffff;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n              </tr>\n            </table>\n\n            <!-- Card body -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"padding:48px 48px 16px 48px;\">\n                  <p style=\"margin:0 0 24px 0;font-family:'Georgia',serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#555555;\">Application Received</p>\n                  <h1 style=\"margin:0 0 15px 0;font-family:'Georgia',serif;font-size:20px;font-weight:10;color:#f0ece4;line-height:1;font-style:italic;\">Hello {{ $('Webhook').item.json.body.firstName }},</h1>\n                </td>\n              </tr>\n\n              <!-- Divider -->\n              <tr>\n                <td style=\"padding:0 48px;\">\n                  <div style=\"height:1px;background-color:#2e2e2e;font-size:0;line-height:0;\">&nbsp;</div>\n                </td>\n              </tr>\n\n              <!-- Body text -->\n              <tr>\n                <td style=\"padding:32px 48px;\">\n                  <p style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Thank you for applying for the <span style=\"color:#f0ece4;font-weight:600;\">{{ $('Webhook').item.json.body.role }}</span> position. We have received your application and it is now with our hiring team for review.\n                  </p>\n                  <p style=\"margin:0 0 32px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    We take our time to review every application carefully. You can expect to hear back from us within <span style=\"color:#f0ece4;\">1–2 weeks</span>. If your profile aligns with what we are looking for, we will reach out about the next steps.\n                  </p>\n                  <p style=\"margin:0 0 6px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    We appreciate your interest in joining Cluff and the effort you put into your application.\n                  <p style=\"margin:0 0 32px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Warm regards,\n                  </p>\n\n                  <!-- Signature -->\n                  <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                    <tr>\n                      <td style=\"padding-right:14px;vertical-align:middle;\">\n                        <div style=\"width:38px;height:38px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:38px;font-family:'Georgia',serif;font-size:14px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</div>\n                      </td>\n                      <td style=\"vertical-align:middle;\">\n                        <p style=\"margin:0;font-family:'Georgia',serif;font-size:14px;font-weight:600;color:#f0ece4;\">The Cluff Team</p>\n                        \n                      </td>\n                    </tr>\n                  </table>\n                </td>\n              </tr>\n\n              <!-- Bottom strip -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                <tr>\n                  <td style=\"background-color:#ffffff;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n                </tr>\n              </table>\n\n            </table>\n          </td>\n        </tr>\n\n        <!-- Footer -->\n        <tr>\n          <td style=\"padding:28px 0 0 0;text-align:center;\">\n            <p style=\"margin:0 0 6px 0;font-family:'Georgia',serif;font-size:12px;color:#444444;line-height:1.7;\">\n              This email was sent to {{ $json.body.email }} regarding your application for {{ $json.body.role }}.\n            </p>\n            <p style=\"margin:0;font-family:'Georgia',serif;font-size:12px;color:#333333;\">\n              &copy; 2026 Cluff. All rights reserved.\n            </p>\n          </td>\n        </tr>\n\n      </table>\n    </td>\n  </tr>\n</table>\n\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Cluff"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        -64
+      ],
+      "id": "c547bc84-2b15-4e69-aa33-df9e1e7c7830",
+      "name": "thank you email",
+      "webhookId": "5db002df-5a1c-4f22-8bda-62c259e26e1c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "B51zJ5ZSwS3fAPLk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Important information about your application to Cluff",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Application Update</title>\n</head>\n<body style=\"margin:0;padding:0;background-color:#0d0d0d;font-family:'Georgia',Georgia,serif;\">\n\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#0d0d0d;padding:48px 20px;\">\n  <tr>\n    <td align=\"center\">\n\n      <table width=\"580\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"max-width:580px;width:100%;\">\n\n        <!-- Logo row -->\n        <tr>\n          <td style=\"padding:0 0 32px 0;\">\n            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"width:36px;height:36px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:36px;font-family:'Georgia',serif;font-size:15px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</td>\n                <td style=\"padding-left:10px;font-family:'Georgia',serif;font-size:14px;color:#666666;letter-spacing:0.1em;text-transform:uppercase;\">Cluff</td>\n              </tr>\n            </table>\n          </td>\n        </tr>\n\n        <!-- Main card -->\n        <tr>\n          <td style=\"background-color:#1a1a1a;border-radius:6px;overflow:hidden;\">\n\n            <!-- Top strip — muted warm tone for rejection -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"background-color:#c8b89a;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n              </tr>\n            </table>\n\n            <!-- Card body -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"padding:48px 48px 16px 48px;\">\n                  <p style=\"margin:0 0 24px 0;font-family:'Georgia',serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#555555;\">Application Update</p>\n                  <h1 style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:20px;font-weight:100;color:#f0ece4;line-height:1;font-style:italic;\"> Dear {{ $('Webhook').item.json.body.firstName }},</h1>\n                </td>\n              </tr>\n\n              <!-- Divider -->\n              <tr>\n                <td style=\"padding:0 48px;\">\n                  <div style=\"height:1px;background-color:#2e2e2e;font-size:0;line-height:0;\">&nbsp;</div>\n                </td>\n              </tr>\n\n              <!-- Body text -->\n              <tr>\n                <td style=\"padding:32px 48px;\">\n                  <p style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Thank you for taking the time to apply for the <span style=\"color:#f0ece4;font-weight:600;\">{{ $('Webhook').item.json.body.role }}</span> position at Cluff. We have carefully reviewed your application and we are sorry to inform you that we will not be moving forward with it at this time.\n                  </p>\n                  <p style=\"margin:0 0 32px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    There are a lot of strong candidates and, based on the information available, we believe some of them are better suited for the role. This was not an easy decision and in no way reflects a lack of appreciation for what you bring.\n                  </p>\n\n                  <p style=\"margin:0 0 6px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Please know that we value the time and effort you dedicated to the application process, and we wish you all the best in your future endeavors.\n                  </p>\n                  <p style=\"margin:0 0 36px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Sincerely,\n                  </p>\n\n                  <!-- Signature -->\n                  <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                    <tr>\n                      <td style=\"padding-right:14px;vertical-align:middle;\">\n                        <div style=\"width:38px;height:38px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:38px;font-family:'Georgia',serif;font-size:14px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</div>\n                      </td>\n                      <td style=\"vertical-align:middle;\">\n                        <p style=\"margin:0;font-family:'Georgia',serif;font-size:14px;font-weight:600;color:#f0ece4;\">The Cluff Team</p>\n                        </p>\n                      </td>\n                    </tr>\n                  </table>\n                </td>\n              </tr>\n            </table>\n\n            <!-- Bottom strip -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"background-color:#c8b89a;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n              </tr>\n            </table>\n\n          </td>\n        </tr>\n\n        <!-- Footer -->\n        <tr>\n          <td style=\"padding:28px 0 0 0;text-align:center;\">\n            <p style=\"margin:0 0 6px 0;font-family:'Georgia',serif;font-size:12px;color:#444444;line-height:1.7;\">\n            </p>\n            <p style=\"margin:0;font-family:'Georgia',serif;font-size:12px;color:#333333;\">\n              &copy; 2026 Cluff. All rights reserved.\n            </p>\n          </td>\n        </tr>\n\n      </table>\n    </td>\n  </tr>\n</table>\n\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Cluff"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        400
+      ],
+      "id": "172cc0b6-b28f-4602-977e-b5ef83e71dde",
+      "name": "rejection email",
+      "webhookId": "934173e2-4343-4c49-be19-0e1842fc7dbb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "B51zJ5ZSwS3fAPLk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an expert recruitment screening specialist. Your job is to evaluate \njob applicants objectively and return a structured JSON score.\n\nYou will receive a candidate's CV/resume along with their application details.\nEvaluate them based on the ROLE they applied for using the job description \nprovided below.\n\n---\nJOB DESCRIPTIONS:\n\nAI AUTOMATION SPECIALIST\n- Design and build end-to-end automation workflows using tools like n8n, \n  Make.com, Zapier, and similar platforms\n- Integrate AI models (OpenAI, Anthropic, etc.) into business workflows\n- Build and manage chatbots, voice agents, and multi-agent systems\n- Connect APIs, webhooks, and third-party services\n- Deliver measurable outcomes: reduced manual workload, improved efficiency\n- Required skills: n8n, Make.com or Zapier, API integration, prompt \n  engineering, basic JavaScript or Python, problem-solving\n- Nice to have: Voiceflow, Airtable, GoHighLevel, Vapi AI, LangChain\n\nSOFTWARE ENGINEER\n- Design, build, and maintain scalable software applications\n- Write clean, tested, production-ready code\n- Collaborate with product and design teams on technical implementation\n- Debug, optimise, and document code\n- Required skills: proficiency in at least one language (Python, JavaScript, \n  TypeScript, Java, etc.), version control (Git), REST APIs, databases (SQL \n  or NoSQL), problem-solving\n- Nice to have: cloud platforms (AWS, GCP, Azure), CI/CD, Docker, system \n  design experience\n\n---\nSCORING CRITERIA (STRICT RUBRIC):\nEvaluate the candidate across these criteria, scoring each using only explicit evidence.\n\n1. RELEVANT EXPERIENCE (0–20)\n   - 0–5:   No relevant work experience for this role\n   - 6–13:  Some related experience but not directly aligned to this role\n   - 14–20: Clear, direct experience matching this role's requirements\n\n2. SKILLS MATCH (0–30)\n   - 0–7:   Missing most required skills listed in the job description\n   - 8–15:  Partial coverage with major gaps\n   - 16–23: Good coverage with some gaps\n   - 24–30: Strong match with required technical and soft skills for this role\n\n3. EDUCATION & CERTIFICATIONS (0–10)\n   - 0-2:   No relevant qualifications\n   - 3-6:  Partially relevant education or certifications\n   - 7-10: Strong academic or professional credentials aligned to this role\n\n4. CAREER PROGRESSION (0–10)\n   - 0–3:   Unclear history, frequent unexplained gaps, or regression\n   - 4–7:   Some growth but inconsistent or lateral moves\n   - 8–10:  Clear upward trajectory with increasing responsibility over time\n\n5. COMMUNICATION CLARITY (0–10)\n   - 0–2:   CV is disorganised, unclear, or unprofessional\n   - 3-6:  Readable but lacks specificity or measurable impact\n   - 7-10: Well-structured, concise, achievement-focused language\n\n6. PRACTICAL BUILD (0–15)\n   Score based on the project, tool, or system the candidate has built.\n   - 0–4:   No real project or unclear\n   - 5–10:  Basic or low-complexity project with limited relevance to this role\n   - 11–15: Strong, relevant real-world system with clear impact\n\n7. ROLE MOTIVATION & FIT (0–5)\n   - 0–1:   Generic or copy-paste response\n   - 2–3:   Some alignment but lacks specificity\n   - 4–5:   Specific, credible, and well-aligned motivation for this role\n---\nROUTING RULES:\n- Score 85–100 → recommendation: \"accept\"  (strong candidate, notify HR)\n- Score 60–84  → recommendation: \"review\"  (borderline, flag for HR with notes)\n- Score 0–59   → recommendation: \"reject\"  (does not meet minimum threshold)\n\nScore tier mapping:\n- Hot  = score 85–100\n- Warm = score 60–84\n- Cold = score 0–59\n\n---\nREQUIRED OUTPUT FORMAT:\nReturn ONLY valid JSON. No explanation, no markdown, no preamble, no \ncode fences. The raw JSON object must be the entire response.\n\n{\n  \"score\": <number 0–100>,\n  \"score_breakdown\": {\n    \"relevant_experience\": <0–20>,\n    \"skills_match\": <0–30>,\n    \"education_certifications\": <0–10>,\n    \"career_progression\": <0–10>,\n    \"communication_clarity\": <0–10>,\n    \"practical_build\": <0–15>,\n    \"role_motivation_fit\": <0–5>\n  },\n  \"recommendation\": \"<accept | review | reject>\",\n  \"score_tier\": \"<Hot | Warm | Cold>\",\n  \"summary\": \"<2–3 sentence professional summary of the candidate>\",\n  \"strengths\": [\"<evidence-based strength>\", \"<evidence-based strength>\"],\n  \"red_flags\": [\"<gap or risk if any>\"]\n}\n\n\nSCORING RULES:\n- recommendation and score_tier must always align with the score\n- Be conservative: Only assign top-tier scores (≥85 total) with strong, explicit evidence\n- Do NOT assume missing information\n- Missing data → lower score + add to red_flags\n- If SKILLS MATCH is below 10 → recommendation MUST be \"reject\"\n- Never return null, undefined, or empty arrays for any field\n- Practical build <5 → cannot be \"accept\"\n- If more than 2 categories are below midpoint → total score must be <70\n- Every high score must be justified by specific evidence in the CV or inputs\n\nCANDIDATE DETAILS:\nFirst_name: {{ $('Webhook').item.json.body.firstName }}\nLast_name: {{ $('Webhook').item.json.body.lastName }}\nEmail: {{ $('Webhook').item.json.body.email }}\nPhone: {{ $('Webhook').item.json.body.phone }}\nRole_applied_for: {{ $('Webhook').item.json.body.role }}\nLocation: {{ $('Webhook').item.json.body.location }}\nTools_proficient: {{ $('Webhook').item.json.body.toolsProficient }}\nSomething_built: {{ $('Webhook').item.json.body.somethingBuilt }}\nWhy_fit: {{ $('Webhook').item.json.body.whyFit }}\nApplied_date: {{ $('Webhook').item.json.body.appliedDate }}"
+            },
+            {
+              "type": "file",
+              "fileType": "base64",
+              "fileName": "="
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -1200,
+        160
+      ],
+      "id": "48631f48-bbf9-4b18-9905-c3edc169c101",
+      "name": "Scoring Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "JkxdZ0IWmDPmYOdg",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Interview Invitation",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Interview Invitation</title>\n</head>\n<body style=\"margin:0;padding:0;background-color:#0d0d0d;font-family:'Georgia',Georgia,serif;\">\n\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#0d0d0d;padding:48px 20px;\">\n  <tr>\n    <td align=\"center\">\n\n      <table width=\"580\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"max-width:580px;width:100%;\">\n\n        <!-- Logo row -->\n        <tr>\n          <td style=\"padding:0 0 32px 0;\">\n            <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"width:36px;height:36px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:36px;font-family:'Georgia',serif;font-size:15px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</td>\n                <td style=\"padding-left:10px;font-family:'Georgia',serif;font-size:14px;color:#666666;letter-spacing:0.1em;text-transform:uppercase;\">Cluff</td>\n              </tr>\n            </table>\n          </td>\n        </tr>\n\n        <!-- Main card -->\n        <tr>\n          <td style=\"background-color:#1a1a1a;border-radius:6px;overflow:hidden;\">\n\n            <!-- Top strip -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"background-color:#ffffff;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n              </tr>\n            </table>\n\n            <!-- Card body -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"padding:48px 48px 16px 48px;\">\n                  <p style=\"margin:0 0 24px 0;font-family:'Georgia',serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#555555;\">Cluff application</p>\n                  <h1 style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:20px;font-weight:100;color:#f0ece4;line-height:1;font-style:italic;\">You've been selected for an interview.</h1>\n                </td>\n              </tr>\n\n              <!-- Divider -->\n              <tr>\n                <td style=\"padding:0 48px;\">\n                  <div style=\"height:1px;background-color:#2e2e2e;font-size:0;line-height:0;\">&nbsp;</div>\n                </td>\n              </tr>\n\n              <!-- Body text -->\n              <tr>\n                <td style=\"padding:32px 48px 0 48px;\">\n                  <p style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    Dear {{ $('Webhook').item.json.body.firstName }},\n                  </p>\n                  <p style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">Congratulations — after reviewing your application for the <span style=\"color:#f0ece4;font-weight:600;\">{{ $('Webhook').item.json.body.role }}</span> position, we are pleased to invite you to the next stage of our hiring process.\n                  </p>\n                  <p style=\"margin:0 0 32px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    We would like to schedule a conversation with you to learn more about your background and give you a chance to learn more about us.\n                  </p>\n\n                  <!-- Interview format details box -->\n                  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#222222;border-radius:4px;margin-bottom:32px;\">\n                    <tr>\n                      <td style=\"padding:24px 28px;\">\n                        <p style=\"margin:0 0 18px 0;font-family:'Georgia',serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#555555;\">What to expect</p>\n                        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                          <tr>\n                            <td style=\"padding:7px 0;font-family:'Georgia',serif;font-size:14px;color:#888888;line-height:1.7;\">\n                              <span style=\"color:#f0ece4;font-weight:600;margin-right:12px;\">01</span>A brief introduction — your background and motivations\n                            </td>\n                          </tr>\n                          <tr>\n                            <td style=\"padding:7px 0;font-family:'Georgia',serif;font-size:14px;color:#888888;line-height:1.7;\">\n                              <span style=\"color:#f0ece4;font-weight:600;margin-right:12px;\">02</span>Role-specific questions and a short scenario\n                            </td>\n                          </tr>\n                          <tr>\n                            <td style=\"padding:7px 0;font-family:'Georgia',serif;font-size:14px;color:#888888;line-height:1.7;\">\n                              <span style=\"color:#f0ece4;font-weight:600;margin-right:12px;\">03</span>Your questions about the role and the team\n                            </td>\n                          </tr>\n                          <tr>\n                            <td style=\"padding:14px 0 0 0;\">\n                              <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                                <tr>\n                                  <td style=\"padding-right:24px;\">\n                                    <p style=\"margin:0 0 3px 0;font-family:'Georgia',serif;font-size:11px;color:#555555;text-transform:uppercase;letter-spacing:0.1em;\">Format</p>\n                                    <p style=\"margin:0;font-family:'Georgia',serif;font-size:13px;color:#f0ece4;\">Video call</p>\n                                  </td>\n                                  <td>\n                                    <p style=\"margin:0 0 3px 0;font-family:'Georgia',serif;font-size:11px;color:#555555;text-transform:uppercase;letter-spacing:0.1em;\">Duration</p>\n                                    <p style=\"margin:0;font-family:'Georgia',serif;font-size:13px;color:#f0ece4;\">~30 minutes</p>\n                                  </td>\n                                </tr>\n                              </table>\n                            </td>\n                          </tr>\n                        </table>\n                      </td>\n                    </tr>\n                  </table>\n\n                  <!-- Scheduling CTA -->\n                  <p style=\"margin:0 0 20px 0;font-family:'Georgia',serif;font-size:14px;color:#888888;line-height:1.7;\">Pick a time that works for you by clicking below to view available slots and book directly on our calendar.</p>\n                  <a href=\"https://calendly.com/igbeagucj/30min\"\n                     style=\"display:inline-block;background-color:#ffffff;color:#0d0d0d;font-family:'Georgia',serif;font-size:14px;font-weight:700;letter-spacing:0.06em;padding:14px 36px;border-radius:2px;text-decoration:none;\">\n                    Schedule my interview &rarr;\n                  </a>\n\n                  <p style=\"margin:36px 0 36px 0;font-family:'Georgia',serif;font-size:15px;color:#aaaaaa;line-height:1.85;\">\n                    We look forward to speaking with you.\n                  </p>\n\n                  <!-- Signature -->\n                  <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                    <tr>\n                      <td style=\"padding-right:14px;vertical-align:middle;\">\n                        <div style=\"width:38px;height:38px;background-color:#ffffff;border-radius:50%;text-align:center;line-height:38px;font-family:'Georgia',serif;font-size:14px;color:#0d0d0d;font-style:italic;font-weight:700;\">C</div>\n                      </td>\n                      <td style=\"vertical-align:middle;\">\n                        <p style=\"margin:0;font-family:'Georgia',serif;font-size:14px;font-weight:600;color:#f0ece4;\">The Cluff Team</p>\n                      </td>\n                    </tr>\n                  </table>\n                </td>\n              </tr>\n\n              <tr><td style=\"height:40px;\"></td></tr>\n            </table>\n\n            <!-- Bottom strip -->\n            <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n              <tr>\n                <td style=\"background-color:#ffffff;height:3px;font-size:0;line-height:0;\">&nbsp;</td>\n              </tr>\n            </table>\n\n          </td>\n        </tr>\n\n        <!-- Footer -->\n        <tr>\n          <td style=\"padding:28px 0 0 0;text-align:center;\">\n            <p style=\"margin:0;font-family:'Georgia',serif;font-size:12px;color:#333333;\">\n              &copy; 2026 Cluff. All rights reserved.\n            </p>\n          </td>\n        </tr>\n\n      </table>\n    </td>\n  </tr>\n</table>\n\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Cluff"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        144
+      ],
+      "id": "ddf419cf-d77c-457d-8d6f-1be742f0debb",
+      "name": "interview email",
+      "webhookId": "675064f8-5f02-4bd6-931a-7e088908e059",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "B51zJ5ZSwS3fAPLk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 7,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        144
+      ],
+      "id": "a11d3312-6c2e-49c5-bd74-690aaa8868d7",
+      "name": "Wait",
+      "webhookId": "6e234911-6061-4afb-8d15-bbde640c112d"
+    },
+    {
+      "parameters": {
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        400
+      ],
+      "id": "aa2a3ead-3416-4b89-8994-e6e4f7e6b862",
+      "name": "Wait1",
+      "webhookId": "6e234911-6061-4afb-8d15-bbde640c112d"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appXVZvsmXZInguej",
+          "mode": "list",
+          "cachedResultName": "Applicant Tracker",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9PGyHK9CBN3TY8",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej/tbl9PGyHK9CBN3TY8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Webhook').item.json.body.firstName }} {{ $('Webhook').item.json.body.lastName }}",
+            "Email": "={{ $('Webhook').item.json.body.email }}",
+            "Phone": "={{ $('Webhook').item.json.body.phone }}",
+            "Role": "={{ $('Webhook').item.json.body.role }}",
+            "Application Date": "={{ $('Webhook').item.json.body.appliedDate }}",
+            "Status": "Interview Scheduled",
+            "AI Summary": "={{ $('Scoring Agent').item.json.output[0].content[0].text.summary }}",
+            "Score (tier)": "={{ $('Scoring Agent').item.json.output[0].content[0].text.score }} ({{ $('Scoring Agent').item.json.output[0].content[0].text.score_tier }})",
+            "Resume URL": "={{ $('Download resume').item.json.webViewLink }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "AI Automation Specialist",
+                  "value": "AI Automation Specialist"
+                },
+                {
+                  "name": "Software Engineer",
+                  "value": "Software Engineer"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resume URL",
+              "displayName": "Resume URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score (tier)",
+              "displayName": "Score (tier)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Interview Scheduled",
+                  "value": "Interview Scheduled"
+                },
+                {
+                  "name": "Rejected - HR",
+                  "value": "Rejected - HR"
+                },
+                {
+                  "name": "Rejected - Low Score",
+                  "value": "Rejected - Low Score"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Application Date",
+              "displayName": "Application Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        112
+      ],
+      "id": "2ba1c9b4-5bb5-4d47-8173-c5fe92371d72",
+      "name": "Applicant tracker",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ME6OIqFggSU9MWc6",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appXVZvsmXZInguej",
+          "mode": "list",
+          "cachedResultName": "Applicant Tracker",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9PGyHK9CBN3TY8",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej/tbl9PGyHK9CBN3TY8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Webhook').item.json.body.firstName }} {{ $('Webhook').item.json.body.lastName }}",
+            "Email": "={{ $('Webhook').item.json.body.email }}",
+            "Phone": "={{ $('Webhook').item.json.body.phone }}",
+            "Role": "={{ $('Webhook').item.json.body.role }}",
+            "Application Date": "={{ $('Webhook').item.json.body.appliedDate }}",
+            "Status": "Rejected - HR",
+            "AI Summary": "={{ $('Scoring Agent').item.json.output[0].content[0].text.summary }}",
+            "Score (tier)": "={{ $('Scoring Agent').item.json.output[0].content[0].text.score }} ({{ $('Scoring Agent').item.json.output[0].content[0].text.score_tier }})",
+            "Resume URL": "={{ $('Download resume').item.json.webViewLink }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "AI Automation Specialist",
+                  "value": "AI Automation Specialist"
+                },
+                {
+                  "name": "Software Engineer",
+                  "value": "Software Engineer"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resume URL",
+              "displayName": "Resume URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score (tier)",
+              "displayName": "Score (tier)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Interview Scheduled",
+                  "value": "Interview Scheduled"
+                },
+                {
+                  "name": "Rejected - HR",
+                  "value": "Rejected - HR"
+                },
+                {
+                  "name": "Rejected - Low Score",
+                  "value": "Rejected - Low Score"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Application Date",
+              "displayName": "Application Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        256
+      ],
+      "id": "d1718350-7244-451f-80d3-a81217baba76",
+      "name": "Applicant tracker1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ME6OIqFggSU9MWc6",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appXVZvsmXZInguej",
+          "mode": "list",
+          "cachedResultName": "Applicant Tracker",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9PGyHK9CBN3TY8",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej/tbl9PGyHK9CBN3TY8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Webhook').item.json.body.firstName }} {{ $('Webhook').item.json.body.lastName }}",
+            "Email": "={{ $('Webhook').item.json.body.email }}",
+            "Phone": "={{ $('Webhook').item.json.body.phone }}",
+            "Role": "={{ $('Webhook').item.json.body.role }}",
+            "Application Date": "={{ $('Webhook').item.json.body.appliedDate }}",
+            "Status": "Rejected - Low Score",
+            "AI Summary": "={{ $('Scoring Agent').item.json.output[0].content[0].text.summary }}",
+            "Score (tier)": "={{ $('Scoring Agent').item.json.output[0].content[0].text.score }} ({{ $('Scoring Agent').item.json.output[0].content[0].text.score_tier }})",
+            "Resume URL": "={{ $('Download resume').item.json.webViewLink }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "AI Automation Specialist",
+                  "value": "AI Automation Specialist"
+                },
+                {
+                  "name": "Software Engineer",
+                  "value": "Software Engineer"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resume URL",
+              "displayName": "Resume URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score (tier)",
+              "displayName": "Score (tier)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Interview Scheduled",
+                  "value": "Interview Scheduled"
+                },
+                {
+                  "name": "Rejected - HR",
+                  "value": "Rejected - HR"
+                },
+                {
+                  "name": "Rejected - Low Score",
+                  "value": "Rejected - Low Score"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Application Date",
+              "displayName": "Application Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        400
+      ],
+      "id": "d3da1610-fd27-4f90-8be8-0b4e998a0fa1",
+      "name": "Applicant tracker2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ME6OIqFggSU9MWc6",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appXVZvsmXZInguej",
+          "mode": "list",
+          "cachedResultName": "Applicant Tracker",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9PGyHK9CBN3TY8",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/appXVZvsmXZInguej/tbl9PGyHK9CBN3TY8"
+        },
+        "filterByFormula": "=({Email} = '{{ $json.body.email }}')",
+        "options": {
+          "fields": [
+            "Email"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        -176
+      ],
+      "id": "2debc86b-7b52-4f24-8505-11b697b82dae",
+      "name": "Search records",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ME6OIqFggSU9MWc6",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ed87debd-a789-4861-ace2-11f8ae3b900a",
+              "leftValue": "={{ Object.keys($json.fields).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        -176
+      ],
+      "id": "a99fdd75-5b90-4657-a370-7b38f69f94dd",
+      "name": "confirm duplicate",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b310af05-a422-4f6d-975e-4e022f97fbbf",
+              "leftValue": "={{ $json.output[0].content[0].text.score }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -880,
+        256
+      ],
+      "id": "1635604a-6f1d-49c4-9cf2-fdd7f46eb6fb",
+      "name": "Qualification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a61bf858-5ca7-4eca-b8ae-a2e7c839fd7d",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        192
+      ],
+      "id": "7b4a0adc-fd0b-43a4-9c57-ce7c7ba43a72",
+      "name": "HR approval"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "resume",
+        "name": "={{ $('Webhook').item.json.body.firstName }} {{ $('Webhook').item.json.body.lastName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "189Etbs-mv8-DTN0U95JFGYIKGWdGFvpn",
+          "mode": "list",
+          "cachedResultName": "Cluff career",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/189Etbs-mv8-DTN0U95JFGYIKGWdGFvpn"
+        },
+        "options": {
+          "simplifyOutput": false
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        80,
+        -64
+      ],
+      "id": "57b13356-e9ae-46b9-b0cf-7e1087b9c232",
+      "name": "Upload resume",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zBLYw3PGlNTi761c",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        304,
+        -64
+      ],
+      "id": "bee0de99-6b44-4554-b4bd-28614ef1e55d",
+      "name": "Download resume",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zBLYw3PGlNTi761c",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $(\"Webhook\").all();\nconst fileData = webhookData.find((item) => item.binary !== undefined)?.binary;\n\nreturn [{ binary: fileData }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -64
+      ],
+      "id": "a640ab01-7a18-4910-a105-47eb65561203",
+      "name": "Extract file"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "joshuaigbeagu66.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+            "content-length": "260047",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-GB,en;q=0.6",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "105.113.34.132",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "NG",
+            "cf-ray": "9f6023546c18d7e8-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryuRoI34uBPKatZUKZ",
+            "origin": "https://cluffcareer.lovable.app",
+            "priority": "u=1, i",
+            "referer": "https://cluffcareer.lovable.app/",
+            "sec-ch-ua": "\"Brave\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "sec-gpc": "1",
+            "x-forwarded-for": "105.113.34.132, 172.71.241.75",
+            "x-forwarded-host": "joshuaigbeagu66.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-113-677599bf78-qplzp",
+            "x-is-trusted": "yes",
+            "x-real-ip": "105.113.34.132"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "firstName": "Joshua",
+            "lastName": "Igbeagu",
+            "email": "joshuaigbeagu@gmail.com",
+            "phone": "+2348113621587",
+            "role": "Software Engineer",
+            "location": "Lagos",
+            "toolsProficient": "n8n, voiceflow, zapier, make.com, vapiAI, LLMs, python",
+            "somethingBuilt": "I once built a system for the hotel that automates only reservations using n8n",
+            "whyFit": "i bring experience from sales background understanding what business needs and providing practical solutions that improve bottlenecks",
+            "submittedAt": "2026-05-03T15:02:34.609Z",
+            "appliedDate": "03 / 05 / 2026\r\n04 : 02 PM"
+          },
+          "webhookUrl": "https://joshuaigbeagu66.app.n8n.cloud/webhook/cluff",
+          "executionMode": "production"
+        },
+        "binary": {
+          "resume": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "Joshua Igbeagu Resume.pdf",
+            "id": "filesystem-v2:workflows/eErrGkD2iNb3Dyg8/executions/temp/binary_data/a990aaa2-7f4c-41ae-87a6-8a87a26af496",
+            "fileSize": "258 kB",
+            "bytes": 258401
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "thank you email": {
+      "main": [
+        [
+          {
+            "node": "Extract file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scoring Agent": {
+      "main": [
+        [
+          {
+            "node": "Qualification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify HR": {
+      "main": [
+        [
+          {
+            "node": "HR approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "interview email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "rejection email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant tracker": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant tracker1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant tracker2": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "confirm duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "confirm duplicate": {
+      "main": [
+        [],
+        [
+          {
+            "node": "thank you email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualification": {
+      "main": [
+        [
+          {
+            "node": "Notify HR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Applicant tracker2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR approval": {
+      "main": [
+        [
+          {
+            "node": "Applicant tracker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Applicant tracker1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload resume": {
+      "main": [
+        [
+          {
+            "node": "Download resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download resume": {
+      "main": [
+        [
+          {
+            "node": "Scoring Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract file": {
+      "main": [
+        [
+          {
+            "node": "Upload resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6ecbd99d-fff0-463f-b743-a00c63592189",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9bfee4ae47cead9b6303a274512b54d1ee61aca8c0da341580634cb76f6eb725"
+  },
+  "id": "eErrGkD2iNb3Dyg8",
+  "tags": []
+}
