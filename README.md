@@ -33,3 +33,4 @@ Manual CV screening is time-consuming and inconsistent. This system automates in
 - Import the provided JSON file into n8n
 - Configure API keys (OpenAI, Airtable, etc.)
 - Activate workflow
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/e92e07e6-1f22-49f8-bdab-f0f89e3f85bc" />
